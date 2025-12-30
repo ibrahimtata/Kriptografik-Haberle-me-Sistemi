@@ -1,18 +1,29 @@
-# 🔒 Kriptografik Haberleşme ve Ağ Analizi
+# 🔒 Kriptografik Haberleşme Sistemi
 
-Bu proje; AES, DES ve RSA algoritmalarını kullanarak istemci-sunucu arasında şifreli veri iletimi sağlar. Wireshark analizi ile şifreleme algoritmalarının paket yapıları incelenmiştir.
+Bu proje; **AES, DES, RSA ve ECC** algoritmalarını kullanarak istemci-sunucu (Client-Server) mimarisinde şifreli veri iletimini simüle eden web tabanlı bir uygulamadır. Projenin temel amacı, modern şifreleme yöntemlerinin çalışma mantığını ve ağ üzerindeki paket yapılarını incelemektir.
 
-## 🛠️ Kurulum
-1. Gerekli kütüphaneleri kurun: `pip install flask pycryptodome`
-2. Sunucuyu çalıştırın: `python app.py`
-3. Tarayıcıdan erişin: `http://127.0.0.1:5000`
+Projenin en özgün yanı; AES ve DES algoritmalarının hazır kütüphanelerin yanı sıra, eğitim amacıyla **bit seviyesinde manuel (el ile)** kodlanmış versiyonlarını da içermesidir. Özellikle manuel implementasyonlarda **Latin-1 kodlaması ve Padding (Dolgu)** yapıları kullanılarak, Türkçe karakterlerin (Unicode) veri kaybı olmadan şifrelenmesi sağlanmış ve bu süreçteki bit manipülasyonları gösterilmiştir.
 
-## 🚀 Öne Çıkanlar
-- **Algoritmalar:** AES (128-bit), DES ve RSA (2048-bit).
-- **Manuel Kodlama:** AES ve DES algoritmaları kütüphane kullanılmadan (S-Box ve Permütasyon yapılarıyla) manuel olarak da kodlanmıştır.
-- **RSA Analizi:** RSA'nın paket boyutunun (256 byte padding nedeniyle) AES'ten daha büyük olduğu ağ trafiği üzerinde kanıtlanmıştır.
+## 🛠️ Kurulum ve Çalıştırma
 
-## 📊 Wireshark Bulguları
-- **Gizlilik:** Ağ üzerinden geçen verilerin okunamaz (Base64) olduğu doğrulanmıştır.
-- **Paket Boyutu:** RSA paketlerinin, simetrik algoritmalara (AES/DES) göre daha yüksek ağ yükü (overhead) oluşturduğu gözlemlenmiştir.
-- **Güvenlik:** Kütüphane kullanımının IV (Initialization Vector) sayesinde her şifrelemede farklı sonuç ürettiği analiz edilmiştir.
+Proje Python ve Flask altyapısını kullanır. Çalıştırmak için şu adımları izleyin:
+
+1. **Gerekli kütüphaneleri yükleyin:**
+   `pip install flask pycryptodome`
+
+2. **Sunucuyu başlatın:**
+   `python app.py`
+
+3. **Tarayıcıdan erişin:**
+   * Gönderici Paneli: `http://127.0.0.1:5000`
+   * Ağ Trafiği (Inbox): `http://127.0.0.1:5000/inbox`
+
+## 🚀 Öne Çıkan Özellikler ve Teknik Analiz
+
+* **Manuel Algoritma Kodlaması:** AES ve DES algoritmaları, S-Box, Feistel Ağları ve Permütasyon tabloları kullanılarak sıfırdan kodlanmıştır. Bu sayede algoritmaların "Under the Hood" (Arka plan) çalışma mantığı gösterilmiştir.
+* **Ağ Analizi (Wireshark Bulguları):** Yapılan testlerde, RSA-2048 şifrelemesinin simetrik algoritmalara (AES/DES) göre ağ üzerinde çok daha yüksek paket boyutu (overhead) oluşturduğu gözlemlenmiştir. Ayrıca, ağ üzerinden geçen tüm verilerin Base64 formatında şifreli olduğu doğrulanmıştır.
+* **Güvenlik:** Standart kütüphanelerde IV (Initialization Vector) kullanımı sayesinde, aynı mesajın her gönderimde farklı bir şifreli çıktı ürettiği ve tekrar saldırılarına (Replay Attack) karşı korunduğu analiz edilmiştir.
+
+## ⚠️ Yasal Uyarı
+Bu proje kapsamındaki manuel şifreleme kodları (AES/DES), algoritmaların matematiksel mantığını kavramak amacıyla **eğitim için** hazırlanmıştır. Gerçek güvenlik gerektiren sistemlerde standart kütüphaneler kullanılmalıdır.
+EOF
