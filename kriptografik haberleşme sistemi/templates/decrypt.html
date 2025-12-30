@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Client: Alıcı</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); margin: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .container { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 50px; }
+        textarea { width: 100%; height: 100px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
+        .method-btn { display: inline-block; padding: 10px 15px; margin: 5px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .method-btn:hover { background: #fff5e6; }
+        .method-btn.selected { background: #e67e22; color: white; border-color: #d35400; transform: scale(1.05); }
+        .btn-decrypt { background: #c0392b; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-top: 15px; }
+        .status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2d3436; color: #dfe6e9; padding: 8px; font-size: 12px; display: flex; justify-content: space-between; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔓 Client: Mesaj Alıcı</h2>
+        <textarea id="cipher-text" placeholder="Şifreli metni buraya yapıştırın..."></textarea>
+        
+        <div class="methods">
+            <div class="method-btn" data-method="AES">AES</div>
+            <div class="method-btn" data-method="MANUEL_AES">MANUEL AES</div>
+            <div class="method-btn" data-method="DES">DES</div>
+            <div class="method-btn" data-method="MANUEL_DES">MANUEL DES</div>
+            <div class="method-btn" data-method="RSA">RSA</div>
+            <div class="method-btn" data-method="ECC">ECC</div>
+        </div>
+
+        <button class="btn-decrypt" onclick="decrypt()">DEŞİFRE ET</button>
+        <div id="output" style="margin-top:20px; color:#c0392b; font-weight:bold; font-size:1.2em;"></div>
+
+        <a href="/" style="display:block; margin-top:20px; color:#555;">⬅ Göndericiye Dön</a>
+    </div>
+
+    <div class="status-bar">
+        <span>👤 <strong>ROLE:</strong> Client (Receiver)</span>
+        <span>🖥️ <strong>CONNECTED TO:</strong> Python Server (127.0.0.1:5000) 🟢</span>
+    </div>
+
+    <script>
+        let selectedMethod = null;
+
+        // Inbox'tan gelen veriyi otomatik doldur
+        window.onload = function() {
+            const p = new URLSearchParams(window.location.search);
+            if(p.get('data')) {
+                document.getElementById('cipher-text').value = p.get('data');
+                const btn = document.querySelector(`.method-btn[data-method="${p.get('method')}"]`);
+                if(btn) btn.click();
+            }
+        };
+
+        document.querySelectorAll('.method-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedMethod = this.getAttribute('data-method');
+            });
+        });
+
+        async function decrypt() {
+            const txt = document.getElementById('cipher-text').value;
+            if (!selectedMethod || !txt) return alert("Eksik bilgi!");
+
+            const res = await fetch('/decrypt', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: txt, method: selectedMethod})
+            });
+            const data = await res.json();
+            if (data.result) {
+                document.getElementById('output').innerText = data.result;
+            } else {
+                document.getElementById('output').innerText = "Hata: " + (data.error || "Sonuç boş döndü (Kod bloğu çalışmadı)");
+            }
+        }
+    </script>
+</body>
+</html>

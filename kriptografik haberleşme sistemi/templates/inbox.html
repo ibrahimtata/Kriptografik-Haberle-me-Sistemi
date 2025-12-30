@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Network: Trafik İzleme</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #dfe6e9; margin: 0; padding: 40px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h2 { text-align: center; color: #2d3436; }
+        .card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #0984e3; }
+        .tag { background: #0984e3; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; margin-right: 10px; }
+        .cipher { color: #d63031; font-family: monospace; background: #ffeaa7; padding: 2px 5px; border-radius: 3px; }
+        .btn-open { text-decoration: none; background: #00b894; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
+        .status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2d3436; color: #dfe6e9; padding: 8px; font-size: 12px; display: flex; justify-content: space-between; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🌐 Ağ Trafiği (Gelen Kutusu)</h2>
+        <div style="text-align:center; margin-bottom:20px;">
+            <a href="/">Gönderici</a> | <a href="/receiver">Alıcı</a>
+        </div>
+        <div id="list">Yükleniyor...</div>
+    </div>
+
+    <div class="status-bar">
+        <span>🌐 <strong>VIEW:</strong> Network Traffic (Public)</span>
+        <span>📡 <strong>SOURCE:</strong> Server Memory Database</span>
+    </div>
+
+    <script>
+        async function load() {
+            const res = await fetch('/get_messages');
+            const data = await res.json();
+            const list = document.getElementById('list');
+            
+            if(data.length === 0) {
+                list.innerHTML = "<p style='text-align:center; color:#636e72;'>Henüz ağ trafiği yok.</p>";
+                return;
+            }
+
+            list.innerHTML = data.map(m => `
+                <div class="card">
+                    <div>
+                        <span class="tag">${m.method}</span>
+                        <span class="cipher">${m.cipher_text.substring(0, 30)}...</span>
+                    </div>
+                    <a href="/receiver?data=${encodeURIComponent(m.cipher_text)}&method=${m.method}" class="btn-open">AÇ 🔓</a>
+                </div>
+            `).reverse().join('');
+        }
+        setInterval(load, 2000);
+        load();
+    </script>
+</body>
+</html>
