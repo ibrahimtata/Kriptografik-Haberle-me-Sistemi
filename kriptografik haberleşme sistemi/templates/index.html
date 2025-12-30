@@ -2,127 +2,45 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kriptografik Haberleşme Sistemi</title>
+    <title>Client: Gönderici</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-        h2 {
-            margin-bottom: 30px;
-            color: #4a4a4a;
-            font-size: 2.5em;
-        }
-        .input-group {
-            margin-bottom: 30px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1.1em;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-        .methods {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .method-btn {
-            background: #f0f0f0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 15px 20px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-            flex: 1 1 200px;
-            min-width: 180px;
-        }
-        .method-btn:hover {
-            background: #e0e0e0;
-            border-color: #667eea;
-        }
-        .method-btn.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        button[type="button"] {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button[type="button"]:hover {
-            background: #218838;
-        }
-        .output {
-            margin-top: 30px;
-            font-size: 1.1em;
-            color: #555;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            border-left: 5px solid #667eea;
-        }
-        #output {
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .container { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); margin-bottom: 50px; }
+        textarea { width: 100%; height: 100px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
+        .method-btn { display: inline-block; padding: 10px 15px; margin: 5px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .method-btn:hover { background: #f0f0f0; }
+        .method-btn.selected { background: #667eea; color: white; border-color: #5a67d8; transform: scale(1.05); }
+        .btn-send { background: #28a745; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-top: 15px; }
+        .status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2d3436; color: #dfe6e9; padding: 8px; font-size: 12px; display: flex; justify-content: space-between; box-sizing: border-box; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Kriptografik Haberleşme Sistemi</h2>
-        <div class="input-group">
-            <input type="text" id="msg" placeholder="Mesajınızı yazın">
-        </div>
+        <h2>📤 Client: Mesaj Gönderici</h2>
+        <textarea id="msg" placeholder="Mesajınızı buraya yazın..."></textarea>
+        
         <div class="methods">
-            <div class="method-btn" data-method="AES">AES (Kütüphaneli)</div>
-            <div class="method-btn" data-method="MANUEL_AES">AES (Manuel - Kütüphanesiz)</div>
-            <div class="method-btn" data-method="DES">DES (Kütüphaneli)</div>
-            <div class="method-btn" data-method="MANUEL_DES">DES (Manuel - Kütüphanesiz)</div>
-            <div class="method-btn" data-method="RSA">RSA (Anahtar Dağıtımı)</div>
+            <div class="method-btn" data-method="AES">AES</div>
+            <div class="method-btn" data-method="MANUEL_AES">MANUEL AES</div>
+            <div class="method-btn" data-method="DES">DES</div>
+            <div class="method-btn" data-method="MANUEL_DES">MANUEL DES</div>
+            <div class="method-btn" data-method="RSA">RSA</div>
+            <div class="method-btn" data-method="ECC">ECC</div>
         </div>
-        <button type="button" onclick="sendData()">Şifrele ve Gönder</button>
-        <div class="output">
-            <p>Sonuç: <div id="output"></div></p>
-        </div>
+
+        <button class="btn-send" onclick="send()">ŞİFRELE VE GÖNDER</button>
+        <div id="result" style="margin-top:20px; color:#2d3436; word-break: break-all;"></div>
+        
+        <a href="/inbox" style="display:block; margin-top:20px; color:#667eea; font-weight:bold;">📨 Ağ Trafiğine Git (Inbox) ➔</a>
+    </div>
+
+    <div class="status-bar">
+        <span>👤 <strong>ROLE:</strong> Client (Browser)</span>
+        <span>🖥️ <strong>CONNECTED TO:</strong> Python Server (127.0.0.1:5000) 🟢</span>
     </div>
 
     <script>
         let selectedMethod = null;
-
         document.querySelectorAll('.method-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
@@ -131,39 +49,22 @@
             });
         });
 
-        async function sendData() {
+        async function send() {
             const msg = document.getElementById('msg').value;
-            if (!selectedMethod) {
-                alert('Lütfen bir şifreleme yöntemini seçin!');
-                return;
-            }
+            if (!selectedMethod || !msg) return alert("Mesaj ve yöntem seçmelisiniz!");
             
-            if (msg.trim() === '') {
-                document.getElementById('output').innerText = '';
-                return;
-            }
-            
-            let targetUrl = '/encrypt'; 
-            if (selectedMethod === 'RSA') {
-                targetUrl = '/encrypt_rsa';
-            }
+            let url = '/encrypt';
+            if (selectedMethod === 'RSA') url = '/encrypt_rsa';
+            if (selectedMethod === 'ECC') url = '/encrypt_ecc';
 
-            try {
-                const response = await fetch(targetUrl, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({message: msg, method: selectedMethod})
-                });
-                
-                const data = await response.json();
-                document.getElementById('output').innerText = data.result;
-            } catch (error) {
-                console.error("Hata:", error);
-                alert("Sunucuya bağlanılamadı!");
-            }
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, method: selectedMethod})
+            });
+            const data = await res.json();
+            document.getElementById('result').innerHTML = `<strong>Sonuç:</strong> ${data.result.substring(0, 50)}... (Sunucuya İletildi)`;
         }
     </script>
 </body>
-
 </html>
-
