@@ -39,44 +39,55 @@ class ManuelAES:
 
     def shift_rows(self, state):
         s = state[:]
-        s[4:8] = s[5:8] + s[4:5]
-        s[8:12] = s[10:12] + s[8:10]
-        s[12:16] = s[15:16] + s[12:15]
+        s[4:8] = s[5:8] + s[4:5]       
+        s[8:12] = s[10:12] + s[8:10]   
+        s[12:16] = s[15:16] + s[12:15] 
         return s
 
     def inv_shift_rows(self, state):
         s = state[:]
         s[4:8] = s[7:8] + s[4:7]
-        s[8:12] = s[10:12] + s[8:10] 
+        s[8:12] = s[10:12] + s[8:10]
         s[12:16] = s[13:16] + s[12:13]
         return s
 
     def add_round_key(self, state, key_bytes):
         return [b ^ key_bytes[i % 16] for i, b in enumerate(state)]
 
+    def print_state(self, step_name, state):
+        hex_str = ' '.join(f'{b:02x}' for b in state)
+        print(f"    └── {step_name}: {hex_str[:30]}...") 
+
     def encrypt(self, plain_text, key):
+        print(f"\n[MANUEL AES] Şifreleme Başladı: '{plain_text}'")
         data = plain_text.encode('utf-8')
-        
         key_bytes = key.encode('utf-8')
-        
         data = self.pad(data)
         
         encrypted_blocks = []
         
         for i in range(0, len(data), 16):
             block = list(data[i:i+16])
+            print(f"  [Blok {i//16}] İşleniyor...")
             
-            block = self.add_round_key(block, key_bytes) 
+            block = self.add_round_key(block, key_bytes)
+            self.print_state("AddRoundKey", block)
             
             block = self.sub_bytes(block)
+            self.print_state("SubBytes   ", block)
+            
             block = self.shift_rows(block)
-            block = self.add_round_key(block, key_bytes) 
+            self.print_state("ShiftRows  ", block)
+            
+            block = self.add_round_key(block, key_bytes)
+            self.print_state("Final Key  ", block)
             
             encrypted_blocks.extend(block)
             
         return bytes(encrypted_blocks).decode('latin-1')
 
     def decrypt(self, cipher_text, key):
+        print(f"\n[MANUEL AES] Deşifreleme Başladı...")
         data = cipher_text.encode('latin-1')
         key_bytes = key.encode('utf-8')
         
@@ -93,7 +104,6 @@ class ManuelAES:
             decrypted_blocks.extend(block)
             
         try:
-            decrypted_data = self.unpad(bytes(decrypted_blocks))
-            return decrypted_data.decode('utf-8')
-        except Exception:
-            return "Hata: Şifre çözülemedi veya yanlış anahtar."
+            return self.unpad(bytes(decrypted_blocks)).decode('utf-8')
+        except:
+            return "Hata: Şifre çözülemedi."
